@@ -1,0 +1,109 @@
+---
+
+const unit = {
+    army : 'fed',
+    unitName : 'TYPE 68C "APPOMATTOX"',
+    points : 0,
+    role : 'COMMAND POST CARRIER',
+    type : 'Vec',
+    height : 'H2',
+    spotting : 'S32"',
+    movement : 'M8"',
+    quality : 'Q3',
+    toughness : 'T6/4/4',
+    command : 'C3',
+    specialRules : [
+        'Amphibious',
+        'Brigade (3, 12")',
+        'NBC'
+    ],
+    additionalRules : '',
+    weapons: [
+        {
+            weaponName : 'Pequod SA 11.5mm, commander\'s issue',
+            targeting : 'All',
+            range : 'R2"',
+            accuracy : 'A4+/4+',
+            strength : 'S1+/1+',
+            dice : 'D1',
+            ammo : '',
+            specialRules : [
+                'Small Arm'
+            ]
+        },
+        {
+            weaponName : '1M1V Target Bearing Transmitter',
+            targeting : 'All',
+            range : 'R32"',
+            accuracy : 'A++/xx',
+            strength : '',
+            dice : 'D1',
+            ammo : '',
+            specialRules : [
+                'Designator',
+                'Discreet'
+            ]
+        },
+        {
+            weaponName : '902V 81mm Smoke Launchers',
+            targeting : 'Gnd',
+            range : 'R6"',
+            accuracy : 'A++/++',
+            strength : '',
+            dice : 'D2',
+            ammo : 'Ammo 1',
+            specialRules : [
+                'Light Indirect (1)',
+                'No CC',
+                'Smoke (3")'
+            ]
+        }
+    ]
+}
+
+---
+
+<div class="unitCard border-black border-3 w-120">
+    <div class="text-xl text-center m-2">
+        <div class="font-bold">{unit.unitName} - <span class="italic">{unit.points}pts</span></div>
+        <div class="">{unit.role}</div>
+    </div>
+    <hr class="black-1000 ml-4 mr-4 border">
+    <div class="statsBlock text-center">
+        <div class="stats font-bold text-lg">
+            {unit.type}, {unit.height}, {unit.spotting}, {unit.movement}, {unit.quality}, 
+            {unit.toughness}{unit.command ? ", " + unit.command : ""}
+        </div>
+        <div class="extraRules italic">
+            {
+                unit.specialRules.map((rule, i) => (
+                   (i !!= unit.specialRules.length - 1) ? rule + ", " : rule + ""
+                ))
+            }
+        </div>
+    </div>
+    <hr class="black-1000 ml-4 mr-4 border">
+    <div class="weapons">
+        {
+            unit.weapons.map((weapon) => (
+                <div class="weapon text-base pl-8">
+                    <div class="font-bold">{weapon.weaponName}</div>
+                    <div class="pl-18">
+                        {weapon.targeting}, {weapon.range}, {weapon.accuracy}, 
+                        {weapon.strength ? weapon.strength + ", " : ""}
+                        {weapon.dice}{weapon.ammo ? ", " + weapon.ammo : ""}{weapon.specialRules?.length > 0 ? ", " : ""}
+                        <span class="italic">                        
+                            {weapon.specialRules?.map((specialRule, i) => (
+                            (i !!= weapon.specialRules.length - 1) ? specialRule + ", " : specialRule + ""
+                        ))}
+                        </span>
+                    </div>
+                </div>
+            ))
+        }
+    </div>
+    </br>
+    <div class="text-base text-center">
+        FEDERAL STATES-ARMY - DREKFORT M.D.C.
+    </div>
+</div>
