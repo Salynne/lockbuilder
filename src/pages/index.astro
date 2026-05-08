@@ -18,10 +18,10 @@ const unitMap = new Map<String, Unit>(
 ---
 
 <Layout title="Firelock List Builder">
-	<div class="m-6">
+	<div class="m-6 flex flex-wrap">
 			<!-- <Roster /> -->
 			 {AEF_UNITS.map(unit => (
-				<UnitCard unit={unit}/>
+				<div class="flex-none"><UnitCard unit={unit}/></div>
 			 ))}
 	</div>
 </Layout>

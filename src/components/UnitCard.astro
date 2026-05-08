@@ -5,6 +5,8 @@ import type { Toughness } from '../data/dataTypes.ts';
 import type { Unit } from '../data/dataTypes.ts';
 import type { Weapon } from '../data/dataTypes.ts';
 import type { ShotType } from '../data/dataTypes.ts';
+import type { UnitStats } from '../data/dataTypes.ts';
+
 
 
 // const unit = {
@@ -184,9 +186,38 @@ function subShot(shotType : ShotType) {
     }
     return listString(statsArray);
 }
+
+function unitStats(stats : UnitStats) {
+    var statsArray = [];
+    if (stats.unitClass) {
+        statsArray.push(stats.unitClass.toString());
+    }
+    if (stats.height) {
+        statsArray.push('H' + stats.height);
+    }
+    if (stats.spottingDistance) {
+        statsArray.push('S' + stats.spottingDistance + '"');
+    }
+    if (stats.movement) {
+        statsArray.push('M' + stats.movement + '"');
+    }
+    if (stats.quality) {
+        statsArray.push('Q' + stats.quality);
+    }
+    if (stats.toughness) {
+        statsArray.push(toughness(stats.toughness));
+    }
+    if (stats.command) {
+        statsArray.push('C' + stats.command);
+    }
+    if (typeof stats.evasion !!= 'undefined') {
+        statsArray.push('E' + stats.evasion);
+    }
+    return listString(statsArray);
+}
 ---
 
-<div class="unitCard border-black border-3 w-120">
+<div class="unitCard border-black border-3 w-120 m-2">
     <div class="text-xl text-center m-2">
         <div class="font-bold">{unit.name.toUpperCase()} - <span class="italic">{unit.points}pts</span></div>
         <div class="">{unit.descriptiveCategory}</div>
@@ -194,19 +225,19 @@ function subShot(shotType : ShotType) {
     <hr class="black-1000 ml-4 mr-4 border">
     <div class="statsBlock text-center">
         <div class="stats font-bold text-lg">
-            {unit.stats.unitClass},
-            H{unit.stats.height},
-            S{unit.stats.spottingDistance}",
-            M{unit.stats.movement}",
-            Q{unit.stats.quality},
-            {toughness(unit.stats.toughness)}{unit.stats.command ? ',' : ''}
-            {unit.stats.command ? 'C' + unit.stats.command : ""}
+            {unitStats(unit.stats)}
         </div>
         <div class="extraRules italic">
             {listString(unit.specialRules)}
         </div>
     </div>
     <hr class="black-1000 ml-4 mr-4 border">
+    { unit.unitAbility &&
+        <div class="text-base italic text-center p-2">
+            {unit.unitAbility}
+        </div>
+        <hr class="black-1000 ml-4 mr-4 border">
+    }
     <div class="weapons">
         {
             unit.weapons?.map((weapon) => (

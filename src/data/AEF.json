@@ -44,7 +44,6 @@
         "command": 3
       },
       "specialRules": [
-        "TACOM",
         "Bloodlust",
         "Infiltrator",
         "Sense (6\")",
@@ -146,7 +145,6 @@
         "command": 4
       },
       "specialRules": [
-        "TACOM",
         "Assault Specialist",
         "Brigade (3, 4\")",
         "NBC"
@@ -265,7 +263,6 @@
         "command": 5
       },
       "specialRules": [
-        "TACOM",
         "Amphibious",
         "Guidance (12\")",
         "Infiltrator",
