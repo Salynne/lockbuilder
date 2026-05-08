@@ -1,103 +1,243 @@
 ---
+import type { WeaponAccuracy } from '../data/dataTypes.ts';
+import type { WeaponStrength } from '../data/dataTypes.ts';
+import type { Toughness } from '../data/dataTypes.ts';
+import type { Unit } from '../data/dataTypes.ts';
+import type { Weapon } from '../data/dataTypes.ts';
+import type { ShotType } from '../data/dataTypes.ts';
 
-const unit = {
-    army : 'fed',
-    unitName : 'TYPE 68C "APPOMATTOX"',
-    points : 0,
-    role : 'COMMAND POST CARRIER',
-    type : 'Vec',
-    height : 'H2',
-    spotting : 'S32"',
-    movement : 'M8"',
-    quality : 'Q3',
-    toughness : 'T6/4/4',
-    command : 'C3',
-    specialRules : [
-        'Amphibious',
-        'Brigade (3, 12")',
-        'NBC'
-    ],
-    additionalRules : '',
-    weapons: [
-        {
-            weaponName : 'Pequod SA 11.5mm, commander\'s issue',
-            targeting : 'All',
-            range : 'R2"',
-            accuracy : 'A4+/4+',
-            strength : 'S1+/1+',
-            dice : 'D1',
-            ammo : '',
-            specialRules : [
-                'Small Arm'
-            ]
-        },
-        {
-            weaponName : '1M1V Target Bearing Transmitter',
-            targeting : 'All',
-            range : 'R32"',
-            accuracy : 'A++/xx',
-            strength : '',
-            dice : 'D1',
-            ammo : '',
-            specialRules : [
-                'Designator',
-                'Discreet'
-            ]
-        },
-        {
-            weaponName : '902V 81mm Smoke Launchers',
-            targeting : 'Gnd',
-            range : 'R6"',
-            accuracy : 'A++/++',
-            strength : '',
-            dice : 'D2',
-            ammo : 'Ammo 1',
-            specialRules : [
-                'Light Indirect (1)',
-                'No CC',
-                'Smoke (3")'
-            ]
-        }
-    ]
+
+// const unit = {
+//     army : 'fed',
+//     idName: 'appomattox',
+//     unitName : 'Type 68C "Appomattox"',
+//     points : 0,
+//     role : 'COMMAND POST CARRIER',
+//     type : 'Vec',
+//     height : 'H2',
+//     spotting : 'S32"',
+//     movement : 'M8"',
+//     quality : 'Q3',
+//     toughness : 'T6/4/4',
+//     command : 'C3',
+//     specialRules : [
+//         'Amphibious',
+//         'Brigade (3, 12")',
+//         'NBC'
+//     ],
+//     additionalRules : '',
+//     weapons: [
+//         {
+//             weaponName : 'Pequod SA 11.5mm, commander\'s issue',
+//             targeting : 'All',
+//             range : 'R2"',
+//             accuracy : 'A4+/4+',
+//             strength : 'S1+/1+',
+//             dice : 'D1',
+//             ammo : '',
+//             specialRules : [
+//                 'Small Arm'
+//             ]
+//         },
+//         {
+//             weaponName : '1M1V Target Bearing Transmitter',
+//             targeting : 'All',
+//             range : 'R32"',
+//             accuracy : 'A++/xx',
+//             strength : '',
+//             dice : 'D1',
+//             ammo : '',
+//             specialRules : [
+//                 'Designator',
+//                 'Discreet'
+//             ]
+//         },
+//         {
+//             weaponName : '902V 81mm Smoke Launchers',
+//             targeting : 'Gnd',
+//             range : 'R6"',
+//             accuracy : 'A++/++',
+//             strength : '',
+//             dice : 'D2',
+//             ammo : 'Ammo 1',
+//             specialRules : [
+//                 'Light Indirect (1)',
+//                 'No CC',
+//                 'Smoke (3")'
+//             ]
+//         }
+//     ]
+// }
+
+interface Props {
+    unit: Unit;
 }
 
+const { unit } = Astro.props as Props;
+
+function toughness(toughness?: Toughness) {
+    if (!toughness) { return ''; }
+    if (typeof toughness === 'string') {
+        return 'T' + toughness;
+    }
+    if (typeof toughness === 'number') {
+        return 'T' + toughness;
+    }
+    return 'T' + toughness.front + '/' + toughness.side + '/' + toughness.rear;
+}
+
+function listString(rules: string[] | undefined) {
+    if (rules === undefined || rules.length == 0) {
+        return '';
+    }
+    var list = '';
+    for (let i = 0; i < rules.length; ++i) {
+        list += rules[i];
+        if (i !!= rules.length - 1) {
+            list += ', ';
+        }
+    }
+    return list;
+}
+
+function accuracy(accuracy?: number | string | WeaponAccuracy) {
+    if (!accuracy) { return ''; }
+    if (typeof accuracy === 'string') {
+        return 'A' + accuracy;
+    }
+    if (typeof accuracy === 'number') {
+        return 'A' + accuracy;
+    }
+
+    var moving = accuracy.moving;
+    if (typeof moving === 'number') {
+        moving = moving + '+';
+    }
+
+    var stationary = accuracy.stationary;
+    if (typeof stationary === 'number') {
+        stationary = stationary + '+';
+    }
+    return 'A' + stationary + '/' + moving;
+}
+
+function strength(strength?: string | number | WeaponStrength) {
+    if (!strength) { return ''; }
+    if (typeof strength === 'string') {
+        return strength;
+    }
+    if (typeof strength === 'number') {
+        return 'S' + strength;
+    }
+
+    var normal = strength.normal;
+    if (typeof normal === 'number') {
+        normal = normal + '+';
+    }
+
+    var half = strength.halfRange;
+    if (typeof half === 'number') {
+        half = half + '+';
+    }
+    return 'S' + normal + '/' + half;
+}
+
+function weaponStats(weapon: Weapon) {
+    var statsArray = [];
+    if (weapon.target) {
+        statsArray.push(weapon.target);
+    }
+    if (weapon.range) {
+        statsArray.push('R' + weapon.range + '"');
+    }
+    if (weapon.accuracy) {
+        statsArray.push(accuracy(weapon.accuracy));
+    }
+    if (weapon.strength) {
+        statsArray.push(strength(weapon.strength));
+    }
+    if (weapon.dice) {
+        statsArray.push('D' + weapon.dice);
+    }
+    if (weapon.ammo) {
+        statsArray.push('Ammo ' + weapon.ammo);
+    }
+    return listString(statsArray);
+}
+
+function subShot(shotType : ShotType) {
+    var statsArray = [];
+    if (shotType.target) {
+        statsArray.push(shotType.target);
+    }
+    if (shotType.range) {
+        statsArray.push('R' + shotType.range + '"');
+    }
+    if (shotType.accuracy) {
+        statsArray.push(accuracy(shotType.accuracy));
+    }
+    if (shotType.strength) {
+        statsArray.push(strength(shotType.strength));
+    }
+    if (shotType.dice) {
+        statsArray.push('D' + shotType.dice);
+    }
+    return listString(statsArray);
+}
 ---
 
 <div class="unitCard border-black border-3 w-120">
     <div class="text-xl text-center m-2">
-        <div class="font-bold">{unit.unitName} - <span class="italic">{unit.points}pts</span></div>
-        <div class="">{unit.role}</div>
+        <div class="font-bold">{unit.name.toUpperCase()} - <span class="italic">{unit.points}pts</span></div>
+        <div class="">{unit.descriptiveCategory}</div>
     </div>
     <hr class="black-1000 ml-4 mr-4 border">
     <div class="statsBlock text-center">
         <div class="stats font-bold text-lg">
-            {unit.type}, {unit.height}, {unit.spotting}, {unit.movement}, {unit.quality}, 
-            {unit.toughness}{unit.command ? ", " + unit.command : ""}
+            {unit.stats.unitClass},
+            H{unit.stats.height},
+            S{unit.stats.spottingDistance}",
+            M{unit.stats.movement}",
+            Q{unit.stats.quality},
+            {toughness(unit.stats.toughness)}{unit.stats.command ? ',' : ''}
+            {unit.stats.command ? 'C' + unit.stats.command : ""}
         </div>
         <div class="extraRules italic">
-            {
-                unit.specialRules.map((rule, i) => (
-                   (i !!= unit.specialRules.length - 1) ? rule + ", " : rule + ""
-                ))
-            }
+            {listString(unit.specialRules)}
         </div>
     </div>
     <hr class="black-1000 ml-4 mr-4 border">
     <div class="weapons">
         {
-            unit.weapons.map((weapon) => (
+            unit.weapons?.map((weapon) => (
                 <div class="weapon text-base pl-8">
-                    <div class="font-bold">{weapon.weaponName}</div>
+                    <div class="font-bold">{weapon.name}</div>
                     <div class="pl-18">
-                        {weapon.targeting}, {weapon.range}, {weapon.accuracy}, 
-                        {weapon.strength ? weapon.strength + ", " : ""}
-                        {weapon.dice}{weapon.ammo ? ", " + weapon.ammo : ""}{weapon.specialRules?.length > 0 ? ", " : ""}
-                        <span class="italic">                        
-                            {weapon.specialRules?.map((specialRule, i) => (
-                            (i !!= weapon.specialRules.length - 1) ? specialRule + ", " : specialRule + ""
-                        ))}
-                        </span>
+                        <div>
+                            {weaponStats(weapon)}
+                        </div>
+                        <div class="italic">
+                            {listString(weapon.specialRules)}
+                        </div>
+  
                     </div>
+                    {typeof weapon.shotTypes !!= 'undefined' &&
+                            <div>
+                                {weapon.shotTypes.map((shotType) => (
+                                    <div class="font-bold pl-4 italic">&#8594;{shotType.name}</div>
+                                    <div class="pl-18">
+                                        <div>
+                                            {subShot(shotType)}
+                                        </div>
+                                        <div class="italic">
+                                            {listString(shotType.specialRules)}
+                                        </div>
+                                    </div>
+                                ))}
+
+                            </div>
+
+                    }
                 </div>
             ))
         }

@@ -2,11 +2,26 @@
 import Layout from "../layouts/Layout.astro";
 
 import UnitCard from "../components/UnitCard.astro";
+import type { Unit } from "../data/dataTypes";
+import Roster from "../components/Roster.astro";
+
+import AEF from "../data/AEF.json";
+
+const AEF_UNITS: Array<Unit> = AEF.units as Array<Unit>;
+
+const unitMap = new Map<String, Unit>(
+	AEF_UNITS.map(unit => {
+		return [unit.id, unit];
+	}),
+)
 
 ---
 
 <Layout title="Firelock List Builder">
 	<div class="m-6">
-			<UnitCard />
+			<!-- <Roster /> -->
+			 {AEF_UNITS.map(unit => (
+				<UnitCard unit={unit}/>
+			 ))}
 	</div>
 </Layout>
