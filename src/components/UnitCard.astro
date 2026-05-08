@@ -7,72 +7,8 @@ import type { Weapon } from '../data/dataTypes.ts';
 import type { ShotType } from '../data/dataTypes.ts';
 import type { UnitStats } from '../data/dataTypes.ts';
 
-
-
-// const unit = {
-//     army : 'fed',
-//     idName: 'appomattox',
-//     unitName : 'Type 68C "Appomattox"',
-//     points : 0,
-//     role : 'COMMAND POST CARRIER',
-//     type : 'Vec',
-//     height : 'H2',
-//     spotting : 'S32"',
-//     movement : 'M8"',
-//     quality : 'Q3',
-//     toughness : 'T6/4/4',
-//     command : 'C3',
-//     specialRules : [
-//         'Amphibious',
-//         'Brigade (3, 12")',
-//         'NBC'
-//     ],
-//     additionalRules : '',
-//     weapons: [
-//         {
-//             weaponName : 'Pequod SA 11.5mm, commander\'s issue',
-//             targeting : 'All',
-//             range : 'R2"',
-//             accuracy : 'A4+/4+',
-//             strength : 'S1+/1+',
-//             dice : 'D1',
-//             ammo : '',
-//             specialRules : [
-//                 'Small Arm'
-//             ]
-//         },
-//         {
-//             weaponName : '1M1V Target Bearing Transmitter',
-//             targeting : 'All',
-//             range : 'R32"',
-//             accuracy : 'A++/xx',
-//             strength : '',
-//             dice : 'D1',
-//             ammo : '',
-//             specialRules : [
-//                 'Designator',
-//                 'Discreet'
-//             ]
-//         },
-//         {
-//             weaponName : '902V 81mm Smoke Launchers',
-//             targeting : 'Gnd',
-//             range : 'R6"',
-//             accuracy : 'A++/++',
-//             strength : '',
-//             dice : 'D2',
-//             ammo : 'Ammo 1',
-//             specialRules : [
-//                 'Light Indirect (1)',
-//                 'No CC',
-//                 'Smoke (3")'
-//             ]
-//         }
-//     ]
-// }
-
 interface Props {
-    unit: Unit;
+    unit: Unit | undefined;
 }
 
 const { unit } = Astro.props as Props;
@@ -216,65 +152,66 @@ function unitStats(stats : UnitStats) {
     return listString(statsArray);
 }
 ---
-
-<div class="unitCard border-black border-3 w-120 m-2">
-    <div class="text-xl text-center m-2">
-        <div class="font-bold">{unit.name.toUpperCase()} - <span class="italic">{unit.points}pts</span></div>
-        <div class="">{unit.descriptiveCategory}</div>
-    </div>
-    <hr class="black-1000 ml-4 mr-4 border">
-    <div class="statsBlock text-center">
-        <div class="stats font-bold text-lg">
-            {unitStats(unit.stats)}
+{unit &&
+    <div class="unitCard border-black border-3 w-120 m-2">
+        <div class="text-xl text-center m-2">
+            <div class="font-bold">{unit.name.toUpperCase()} - <span class="italic">{unit.points}pts</span></div>
+            <div class="">{unit.descriptiveCategory}</div>
         </div>
-        <div class="extraRules italic">
-            {listString(unit.specialRules)}
-        </div>
-    </div>
-    <hr class="black-1000 ml-4 mr-4 border">
-    { unit.unitAbility &&
-        <div class="text-base italic text-center p-2">
-            {unit.unitAbility}
+        <hr class="black-1000 ml-4 mr-4 border" />
+        <div class="statsBlock text-center">
+            <div class="stats font-bold text-lg">
+                {unitStats(unit.stats)}
+            </div>
+            <div class="extraRules italic">
+                {listString(unit.specialRules)}
+            </div>
         </div>
         <hr class="black-1000 ml-4 mr-4 border">
-    }
-    <div class="weapons">
-        {
-            unit.weapons?.map((weapon) => (
-                <div class="weapon text-base pl-8">
-                    <div class="font-bold">{weapon.name}</div>
-                    <div class="pl-18">
-                        <div>
-                            {weaponStats(weapon)}
-                        </div>
-                        <div class="italic">
-                            {listString(weapon.specialRules)}
-                        </div>
-  
-                    </div>
-                    {typeof weapon.shotTypes !!= 'undefined' &&
-                            <div>
-                                {weapon.shotTypes.map((shotType) => (
-                                    <div class="font-bold pl-4 italic">&#8594;{shotType.name}</div>
-                                    <div class="pl-18">
-                                        <div>
-                                            {subShot(shotType)}
-                                        </div>
-                                        <div class="italic">
-                                            {listString(shotType.specialRules)}
-                                        </div>
-                                    </div>
-                                ))}
-
-                            </div>
-
-                    }
-                </div>
-            ))
+        {unit.unitAbility &&
+            <div>
+                {unit.unitAbility}
+            </div>
+            <hr class="black-1000 ml-4 mr-4 border" />
         }
+        <div class="weapons">
+            {
+                unit.weapons?.map((weapon) => (
+                    <div class="weapon text-base pl-8">
+                        <div class="font-bold">{weapon.name}</div>
+                        <div class="pl-18">
+                            <div>
+                                {weaponStats(weapon)}
+                            </div>
+                            <div class="italic">
+                                {listString(weapon.specialRules)}
+                            </div>
+    
+                        </div>
+                        {typeof weapon.shotTypes !!= 'undefined' &&
+                                <div>
+                                    {weapon.shotTypes.map((shotType) => (
+                                        <div class="font-bold pl-4 italic">&#8594;{shotType.name}</div>
+                                        <div class="pl-18">
+                                            <div>
+                                                {subShot(shotType)}
+                                            </div>
+                                            <div class="italic">
+                                                {listString(shotType.specialRules)}
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                </div>
+
+                        }
+                    </div>
+                ))
+            }
+        </div>
+        <br/>
+        <div class="text-base text-center">
+            FEDERAL STATES-ARMY - DREKFORT M.D.C.
+        </div>
     </div>
-    </br>
-    <div class="text-base text-center">
-        FEDERAL STATES-ARMY - DREKFORT M.D.C.
-    </div>
-</div>
+}
