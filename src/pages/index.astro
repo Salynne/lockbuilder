@@ -2,7 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 
 import type { Unit } from "../data/dataTypes";
-import Button from "../components/Button.astro";
+import type { Roster, RosterUnit} from "../data/rosterData";
+import AddToRosterButton from "../components/AddToRosterButton.astro";
+import ChooseFactionButton from "../components/ChooseFactionButton.astro";
 
 import AEF from "../data/AEF.json";
 import ABS from "../data/ABS.json";
@@ -14,52 +16,140 @@ const ABS_UNITS: Array<Unit> = ABS.units as Array<Unit>;
 const FSA_UNITS: Array<Unit> = FSA.units as Array<Unit>;
 const NRH_UNITS: Array<Unit> = NRH.units as Array<Unit>;
 
-
 const allUnitsMap = new Map<string, Unit>();
-
-
 AEF_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 ABS_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 FSA_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 NRH_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 
-var rosterUnits: Array<Unit> = new Array<Unit>();
+let factionMap = new Map<string, Array<Unit>>();
+factionMap.set('AEF', AEF_UNITS);
+factionMap.set('ABS', ABS_UNITS);
+factionMap.set('FSA', FSA_UNITS);
+factionMap.set('NRH', NRH_UNITS);
 
 const { url } = Astro;
 const params = url.searchParams;
 
-const rosterParams = params.getAll('roster');
-if (typeof rosterParams !!= 'undefined' && rosterParams.length > 0) {
-	rosterParams.map(id => {
-		var unit: Unit | undefined = allUnitsMap.get(id);
-		if (typeof unit !!= 'undefined') {
-			rosterUnits.push(unit);
-		}
-	});
+const rawRoster = params.get('roster');
+
+var roster: Roster;
+var faction: string | null = null;
+var rosterUnits: Array<RosterUnit> | undefined;
+if (rawRoster !!= null) {
+	var decoded = atob(rawRoster);
+	roster = JSON.parse(decoded);
+	faction = roster.faction;
+	rosterUnits = roster.units;
+}
+var selectedFaction: Array<Unit> | undefined;
+if (faction !!= null) {
+	selectedFaction = factionMap.get(faction);
 }
 
-var totalPoints = 0;
-rosterUnits.forEach(unit => totalPoints += unit.points);
+var units: Array<Unit> | undefined;
 
+if (typeof rosterUnits !!= 'undefined') {
+	units = new Array();
+	rosterUnits.map(rosterUnit => {
+		var unit: Unit | undefined = allUnitsMap.get(rosterUnit.unitId);
+		if (typeof unit !!= 'undefined') {
+			units?.push(unit);
+		}
+	})
+}
+function getPoints(unitId : string): number {
+	var unit: Unit | undefined = allUnitsMap.get(unitId);
+	if (typeof unit === 'undefined') {
+		return 0;
+	}
+	return unit.points;
+}
+var totalPoints = 0;
+if (typeof units !!= 'undefined') {
+	units.forEach(unit => totalPoints += unit.points);
+}
 ---
 
-
-
 <Layout title="Firelock List Builder">
+	<script src="../data/dataTypes.ts"></script>
+	<script src="../data/rosterData.ts"></script>
 	<script type="text/javascript">
-		function addToRoster(element, event) {
-			console.log(element.parentElement.id);
+		function getRosterData() {
+			var rosterData = document.getElementById('roster').getAttribute('data-roster');
+			if (rosterData && rosterData.length > 1) {
+				return JSON.parse(atob(rosterData));
+			}
+			return '';
+		}
+
+		function restart(element, event) {
 			var url = new URL(window.location.href);
-			url.searchParams.append('roster', element.parentElement.id);
+			url.searchParams.delete('roster');
+			url.searchParams.delete('faction');
+			window.location.replace(url.toString());
+			return;
+		}
+
+		function addToRoster(element, event) {
+			var rosterData = getRosterData();
+			console.log(rosterData);
+
+			if (typeof rosterData.units === 'undefined') {
+				rosterData.units = new Array();
+			}
+			rosterData.units.push({
+				unitId: element.parentElement.id
+			});
+			var url = new URL(window.location.href);
+			var stringified = JSON.stringify(rosterData);
+			url.searchParams.set('roster', btoa(stringified));
+			window.location.replace(url.toString());
+			return;
+		}
+
+		function removeFromRoster(element, event) {
+			var url = new URL(window.location.href);
+			var entries = url.searchParams.getAll(element.id);
+
+		}
+		function chooseFaction(element, event) {
+			var rosterData = getRosterData();
+			console.log(rosterData);
+			if (rosterData.length < 1) {
+				console.log("empty data");
+				rosterData = {
+					faction: element.id
+				}
+			}
+			var url = new URL(window.location.href);
+			var stringified = JSON.stringify(rosterData);
+			url.searchParams.append('roster', btoa(stringified));
 			window.location.replace(url.toString());
 			return;
 		}
 	</script>
-	<div class="m-12 grid grid-cols-2">
+
+	<div id="roster" class="m-12 grid grid-cols-2" data-roster={rawRoster}>
+
 		<div class="m-12 w-120">
-			{AEF_UNITS.map(unit => (
+			{typeof selectedFaction === 'undefined' &&
+				<div class="font-bold text-2xl text-center">Choose Faction</div>
+				<hr class="black-1000 ml-4 mr-4 border mb-5" />
+				<div class="grid grid-cols-1 justify-items-center">
+					<ChooseFactionButton faction="AEF">The Army of the Ebon Forest (AEF)</ChooseFactionButton>
+					<ChooseFactionButton faction="ABS">The Atom Barons of Santigria (ABS)</ChooseFactionButton>
+					<ChooseFactionButton faction="FSA">The Federal States-Army (FSA)</ChooseFactionButton>
+					<ChooseFactionButton faction="NRH">The New Rygolic Host (NRH)</ChooseFactionButton>
+				</div>
+			}
+			{typeof selectedFaction !!= 'undefined' && 
+				<button class="border-2 mb-2 pl-4 pr-4 pb-1 text-center font-bold hover:bg-gray-200 hover:scale-105 active:bg-gray-600"
+					onclick={"restart(this, event)"}>Restart</button>
+			}
+			{typeof selectedFaction !!= 'undefined' && selectedFaction.map(unit => (
 				<div id={unit.id} class="border-2 -mb-0.5 align-center">
-					<Button>+</Button>
+					<AddToRosterButton>+</AddToRosterButton>
 					<span>{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</span>
 				</div>
 			))
@@ -68,7 +158,7 @@ rosterUnits.forEach(unit => totalPoints += unit.points);
 		<div class="m-12">
 			<div class="font-bold text-2xl">Roster - {totalPoints}pts</div>
 			<div>
-				{rosterUnits.map(unit => (
+				{typeof units !!= 'undefined' && units.map(unit => (
 					<div>{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</div>
 				))}
 			</div>

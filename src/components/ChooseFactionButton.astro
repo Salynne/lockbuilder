@@ -1,0 +1,17 @@
+---
+
+interface Props {
+    faction: string;
+}
+
+const { faction } = Astro.props as Props;
+
+---
+<div>
+    <button id={faction}
+        class="border-2 m-1 pl-4 pr-4 pb-1 text-center font-bold hover:bg-gray-200 hover:scale-105 active:bg-gray-600"
+        onclick={"chooseFaction(this, event)"}>
+        <slot/>
+    </button>
+</div>
+
