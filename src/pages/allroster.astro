@@ -1,8 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+import UnitCard from "../components/UnitCard.astro";
 import type { Unit } from "../data/dataTypes";
-import Button from "../components/Button.astro";
+import Roster from "../components/Roster.astro";
 
 import AEF from "../data/AEF.json";
 import ABS from "../data/ABS.json";
@@ -14,9 +15,7 @@ const ABS_UNITS: Array<Unit> = ABS.units as Array<Unit>;
 const FSA_UNITS: Array<Unit> = FSA.units as Array<Unit>;
 const NRH_UNITS: Array<Unit> = NRH.units as Array<Unit>;
 
-
-const allUnitsMap = new Map<string, Unit>();
-
+const allUnitsMap = new Map<string, Unit>()
 
 AEF_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 ABS_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
@@ -25,22 +24,19 @@ NRH_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 ---
 
 <Layout title="Firelock List Builder">
-	<div class="m-12 grid grid-cols-2">
-		<div class="m-12 w-120">
+	<div class="m-6 flex flex-wrap">
+			<!-- <Roster /> -->
 			{AEF_UNITS.map(unit => (
-				<div id={unit.id} class="border-2 -mb-0.5 align-center">
-					<Button>+</Button>
-					<span>{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</span>
-				</div>
-			))
-			}
-		</div>
-		<div class="m-12">
-			<div class="font-bold text-2xl">Roster</div>
-		</div>
-	</div>
-
-	<div class="m-12">
-		<a href="/allroster" class="underline">All Roster Data</a>
+				<div class="flex-none"><UnitCard unit={unit}/></div>
+			 ))}
+			{ABS_UNITS.map(unit => (
+				<div class="flex-none"><UnitCard unit={unit}/></div>
+			 ))}
+			{FSA_UNITS.map(unit => (
+				<div class="flex-none"><UnitCard unit={unit}/></div>
+			 ))}
+			{NRH_UNITS.map(unit => (
+				<div class="flex-none"><UnitCard unit={unit}/></div>
+			 ))}
 	</div>
 </Layout>
