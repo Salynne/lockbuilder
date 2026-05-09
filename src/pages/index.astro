@@ -22,9 +22,39 @@ AEF_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 ABS_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 FSA_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 NRH_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
+
+var rosterUnits: Array<Unit> = new Array<Unit>();
+
+const { url } = Astro;
+const params = url.searchParams;
+
+const rosterParams = params.getAll('roster');
+if (typeof rosterParams !!= 'undefined' && rosterParams.length > 0) {
+	rosterParams.map(id => {
+		var unit: Unit | undefined = allUnitsMap.get(id);
+		if (typeof unit !!= 'undefined') {
+			rosterUnits.push(unit);
+		}
+	});
+}
+
+var totalPoints = 0;
+rosterUnits.forEach(unit => totalPoints += unit.points);
+
 ---
 
+
+
 <Layout title="Firelock List Builder">
+	<script type="text/javascript">
+		function addToRoster(element, event) {
+			console.log(element.parentElement.id);
+			var url = new URL(window.location.href);
+			url.searchParams.append('roster', element.parentElement.id);
+			window.location.replace(url.toString());
+			return;
+		}
+	</script>
 	<div class="m-12 grid grid-cols-2">
 		<div class="m-12 w-120">
 			{AEF_UNITS.map(unit => (
@@ -36,7 +66,12 @@ NRH_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 			}
 		</div>
 		<div class="m-12">
-			<div class="font-bold text-2xl">Roster</div>
+			<div class="font-bold text-2xl">Roster - {totalPoints}pts</div>
+			<div>
+				{rosterUnits.map(unit => (
+					<div>{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</div>
+				))}
+			</div>
 		</div>
 	</div>
 
@@ -44,3 +79,4 @@ NRH_UNITS.map(unit => allUnitsMap.set(unit.id, unit));
 		<a href="/allroster" class="underline">All Roster Data</a>
 	</div>
 </Layout>
+

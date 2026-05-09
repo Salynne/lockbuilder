@@ -92,7 +92,7 @@ export interface Unit {
   category: UnitCategory;
   subcategory?: string;
   descriptiveCategory?: string;
-  points: number | string; // number or "X/Y" for split costs
+  points: number;
   stats: UnitStats;
   specialRules?: string[]; // Array of special rule names (e.g., "NBC", "Brigade (3, 12\")")
   unitAbility?: string; // Unit special ability description
