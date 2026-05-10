@@ -130,11 +130,11 @@ if (typeof units !!= 'undefined') {
 		}
 	</script>
 
-	<div id="roster" class="m-12 grid grid-cols-2" data-roster={rawRoster}>
+	<div id="roster" class="m-6 grid grid-cols-2 text-xs sm:text-sm md:text-base text-center" data-roster={rawRoster}>
 
-		<div class="m-12 w-120">
+		<div class="m-2 md:m-6 lg:m-12 max-w-120">
 			{typeof selectedFaction === 'undefined' &&
-				<div class="font-bold text-2xl text-center">Choose Faction</div>
+				<div class="font-bold text-sm md:text-base lg:text-2xl ">Choose Faction</div>
 				<hr class="black-1000 ml-4 mr-4 border mb-5" />
 				<div class="grid grid-cols-1 justify-items-center">
 					<ChooseFactionButton faction="AEF">The Army of the Ebon Forest (AEF)</ChooseFactionButton>
@@ -147,16 +147,18 @@ if (typeof units !!= 'undefined') {
 				<button class="border-2 mb-2 pl-4 pr-4 pb-1 text-center font-bold hover:bg-gray-200 hover:scale-105 active:bg-gray-600"
 					onclick={"restart(this, event)"}>Restart</button>
 			}
+			<div class="">
 			{typeof selectedFaction !!= 'undefined' && selectedFaction.map(unit => (
-				<div id={unit.id} class="border-2 -mb-0.5 align-center">
+				<div id={unit.id} class="border-2 -mb-0.5 grid grid-cols-[20%_80%] justify-items-start">
 					<AddToRosterButton>+</AddToRosterButton>
-					<span>{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</span>
+					<div class="pr-5">{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</div>
 				</div>
 			))
 			}
+			</div>
 		</div>
-		<div class="m-12">
-			<div class="font-bold text-2xl">Roster - {totalPoints}pts</div>
+		<div class="m-2 md:m-6 lg:m-12">
+			<div class="font-bold text-sm md:text-base lg:text-2xl ">Roster - {totalPoints}pts</div>
 			<div>
 				{typeof units !!= 'undefined' && units.map(unit => (
 					<div>{unit.name} - {unit.points}pts {unit.category === 'TACOMS' && <span class="font-bold"> (TACOM)</span>}</div>
